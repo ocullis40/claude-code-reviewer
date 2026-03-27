@@ -25,7 +25,7 @@ A Claude Code custom slash command (`/review`) that reviews staged and unstaged 
 ### Edge Cases
 
 - **Empty diff** — if both `git diff` and `git diff --cached` return empty, print "No changes to review." and exit.
-- **Large diffs** — if the combined diff exceeds roughly 1,500 lines, the prompt instructs Claude to review only staged changes (`git diff --cached`) and skip unstaged changes with a note: "Unstaged changes were too large to include. Stage your changes and re-run, or review in smaller batches."
+- **Large diffs** — the prompt instructs Claude to first check diff sizes by running `git diff --cached | wc -l` and `git diff | wc -l`. If the combined count exceeds roughly 1,500 lines, review only staged changes and print: "Unstaged changes were too large to include. Stage your changes and re-run, or review in smaller batches." This two-step approach avoids consuming context on a diff that will be discarded.
 
 ## Output Format
 
