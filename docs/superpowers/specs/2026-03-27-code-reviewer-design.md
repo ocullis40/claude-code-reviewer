@@ -14,18 +14,18 @@ A Claude Code custom slash command (`/review`) that reviews staged and unstaged 
 
 ## How It Works
 
-1. **Get the diff** — the slash command prompt instructs Claude to run `git diff` (unstaged) and `git diff --cached` (staged) to capture all pending changes. Untracked files (not yet `git add`ed) are excluded — only tracked, modified files are reviewed.
-2. **Analyze and group** — Claude reads the diff and groups changes by functional area (e.g. "Authentication", "API routes", "Database layer"). The prompt includes guidance on grouping: use directory structure and file naming to identify areas, and group related changes across files into a single area when they serve the same purpose.
+1. **Get the diff** — the slash command prompt instructs Claude to run `git diff` (unstaged) and `git diff --cached` (staged) to capture all pending changes. Untracked files (not yet `git add`ed) are excluded. Newly created files that have been staged are included via `git diff --cached`.
+2. **Analyze and group** — Claude reads the diff and groups changes by functional area (e.g. "Authentication", "API routes", "Database layer"). The prompt includes grouping guidance with examples: files under `src/app/api/` group as "API Routes", files under `src/components/` group as "UI Components", test files group as "Tests" unless they clearly belong to a single functional area, and related changes across files are grouped together when they serve the same purpose.
 3. **Assign severity** — each finding is labeled:
    - **Critical** — must fix before committing (security vulnerabilities, data loss risks, broken logic)
    - **Important** — should fix (missing error handling, pattern inconsistencies, edge cases)
    - **Suggestion** — nice to have (readability improvements, minor refactors)
-4. **Print summary** — formatted output with functional area headings, one-liner findings with severity and `file:line` references. Areas with no issues get a brief "looks good" note to confirm they were reviewed.
+4. **Print summary** — formatted output with functional area headings, one-liner findings with severity and `file:line` references (line numbers are derived from diff hunk headers and may be approximate). Areas with no issues get a brief "looks good" note to confirm they were reviewed.
 
 ### Edge Cases
 
 - **Empty diff** — if both `git diff` and `git diff --cached` return empty, print "No changes to review." and exit.
-- **Large diffs** — if the diff is very large, the prompt instructs Claude to focus on staged changes first (`git diff --cached`), and summarize unstaged changes at a higher level if context is limited.
+- **Large diffs** — if the combined diff exceeds roughly 1,500 lines, the prompt instructs Claude to review only staged changes (`git diff --cached`) and skip unstaged changes with a note: "Unstaged changes were too large to include. Stage your changes and re-run, or review in smaller batches."
 
 ## Output Format
 
