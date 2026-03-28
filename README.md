@@ -9,25 +9,24 @@ A Claude Code `/review` slash command that performs two-phase code review on you
 
 ## Installation
 
-### Option A: Add to Claude Code settings
+### Option A: Install as a global skill (recommended)
 
-Add the commands path to your Claude Code settings (`~/.claude/settings.json`):
+Copy the command into your Claude Code skills directory:
 
-```json
-{
-  "projects": {
-    "/path/to/your-project": {
-      "commandPaths": ["/path/to/claude-code-reviewer/commands"]
-    }
-  }
-}
+```bash
+mkdir -p ~/.claude/skills/code-review
+cp /path/to/claude-code-reviewer/commands/diff-review.md ~/.claude/skills/code-review/SKILL.md
 ```
 
-### Option B: Symlink into your project
+This makes `/code-review` available in all projects.
+
+### Option B: Install per-project
+
+Symlink or copy into a specific project's commands directory:
 
 ```bash
 mkdir -p .claude/commands
-ln -s /path/to/claude-code-reviewer/commands/review.md .claude/commands/review.md
+ln -s /path/to/claude-code-reviewer/commands/diff-review.md .claude/commands/code-review.md
 ```
 
 ## Usage
